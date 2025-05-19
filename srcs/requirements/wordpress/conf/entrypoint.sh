@@ -3,7 +3,13 @@ set -e
 
 sleep 10
 
-echo "⏳ Attente de MariaDB..."
+echo "⏳ Attente de MariaDB (${MYSQL_HOST})..."
+
+until mariadb -h "${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1;" > /dev/null 2>&1; do
+    echo "🔁 En attente de MariaDB..."
+    sleep 1
+done
+echo "✅ MariaDB est prêt !"
 
 cd /var/www/html
 
@@ -21,7 +27,6 @@ if [ ! -f wp-config.php ]; then
         --dbuser="${MYSQL_USER}" \
         --dbpass="${MYSQL_PASSWORD}" \
         --dbhost="${MYSQL_HOST}" \
-        --dbhost=mariadb:3306 --path='/var/www/html' \
         --path="/var/www/html" \
         --allow-root
 
@@ -39,7 +44,7 @@ if [ ! -f wp-config.php ]; then
 	wp user create	$WP_USER $WP_USER_EMAIL			\
 					--allow-root					\
 					--role=author					\
-					--user_pass=$WP_USER_PASS	
+					--user_pass="${WP_USER_PASS}"
 else
     echo "✅ WordPress est déjà configuré, on ne refait rien."
 fi

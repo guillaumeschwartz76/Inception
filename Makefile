@@ -1,21 +1,31 @@
-.PHONY: up
+.PHONY: up clean fclean down ps re
+
+WORDVOLUME := /home/gui/data/wordpress
+MARIAVOLUME := /home/gui/data/database
+
+NAME := Inception
 
 SRCS_DIR = ./srcs
 
-up:
-	@cd $(SRCS_DIR) && sudo docker compose up --build -d --force-recreate
+up: $(NAME)
+
+$(NAME):
+	@mkdir - p $(WORDVOLUME) $(MARIAVOLUME)
+	@cd $(SRCS_DIR) && docker compose up --build -d --force-recreate
 
 down:
-	@cd $(SRCS_DIR) && sudo docker compose down
+	@cd $(SRCS_DIR) && docker compose -f down
+
 ps:
-	@cd $(SRCS_DIR) && sudo docker compose ps
+	@cd $(SRCS_DIR) && docker compose ps
 
 clean:
-	@cd $(SRCS_DIR) && sudo docker compose down --volumes --remove-orphans
+	@cd $(SRCS_DIR) && docker compose -f down --volumes --remove-orphans
 
 fclean: clean
-	@sudo docker system prune -af
-	@sudo docker volume prune -f 
+	@docker system prune -af --volumes
+	@docker volume prune -f
+	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME)
 
 re: fclean up
 

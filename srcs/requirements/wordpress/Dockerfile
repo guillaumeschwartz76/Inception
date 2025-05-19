@@ -1,14 +1,14 @@
 FROM debian:12.10
 
  RUN apt update && apt upgrade -y \
- && apt-get -y install wget
-
- RUN apt-get install -y php8.2\
- php-fpm\
- php-mysql\
+ && apt-get install -y wget curl unzip \
+ php8.2\
+ php8.2-fpm\
+ php8.2-mysql\
  mariadb-client
  
- RUN wget https://fr.wordpress.org/wordpress-6.8-fr_FR.tar.gz -P /tmp \
+ RUN mkdir -p /var/www/html \
+ && wget https://fr.wordpress.org/wordpress-6.8-fr_FR.tar.gz -P /tmp \
  && tar -xzf /tmp/wordpress-6.8-fr_FR.tar.gz -C /tmp \
  && mv /tmp/wordpress/* /var/www/html/ \
  && chown -R www-data:www-data /var/www/html \
@@ -22,9 +22,12 @@ FROM debian:12.10
  && chmod +x wp-cli.phar \
  && mv wp-cli.phar /usr/local/bin/wp
 
+ RUN ln -sf /dev/stdout /var/log/php7.4-fpm.log
+
+ COPY conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
  COPY conf/entrypoint.sh /entrypoint.sh
 
- RUN chmod +x /entrypoint.sh
+ RUN chmod u+x /entrypoint.sh
 
  EXPOSE 9000
 

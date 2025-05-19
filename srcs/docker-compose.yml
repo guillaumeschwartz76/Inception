@@ -1,51 +1,33 @@
 services:
   mariadb:
+    container_name: mariadb
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
-    container_name: mariadb
+    networks:
+      - inception
+    expose:
+      - 3306
+    restart: always
     env_file:
       - path: .env
         required: true
-    volumes:
-      - mariadb:/var/lib/mysql
     secrets:
       - db_root_password
       - db_password
-    expose:
-      - '3306:3306'
-    networks:
-      - inception
-    restart: always
+    volumes:
+      - mariadb:/var/lib/mysql
 
   wordpress:
+    container_name: wordpress
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
-    container_name: wordpress
-    depends_on:
-      - mariadb
-    env_file:
-      - path: .env
-        required: true
-    secrets:
-      - db_root_password
-      - db_password
-    volumes:
-      - wordpress:/var/www/html
     networks:
       - inception
     expose:
-      - "9000:9000"
+      - 9000
     restart: always
-
-  nginx:
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-    container_name: nginx
-    depends_on:
-      - wordpress
     env_file:
       - path: .env
         required: true
@@ -54,11 +36,29 @@ services:
       - db_password
     volumes:
       - wordpress:/var/www/html
+    depends_on:
+      - mariadb
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 443:443
     networks:
       - inception
-    ports:
-      - "443:443"
     restart: always
+    env_file:
+      - path: .env
+        required: true
+    secrets:
+      - db_root_password
+      - db_password
+    volumes:
+      - wordpress:/var/www/html
+    depends_on:
+      - wordpress
 
 volumes:
   wordpress:
@@ -66,13 +66,13 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/gui/inception/srcs/requirements/wordpress'
+      device: '/home/gui/data/wordpress'
   mariadb:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/gui/inception/srcs/requirements/mariadb'
+      device: '/home/gui/data/mariadb'
 
 networks:
   inception:
