@@ -12,7 +12,7 @@ FROM debian:12.10
     && echo "Répertoires créés avec succès"
 
 # Vérification de l'installation de nginx
-# RUN nginx -v
+ RUN nginx -v
 
  ADD . /srcs/requirements/nginx
  WORKDIR  /srcs/requirements/nginx

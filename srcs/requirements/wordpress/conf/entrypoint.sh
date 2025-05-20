@@ -1,15 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "⏳ Attente de MariaDB ..."
+
 sleep 10
-
-echo "⏳ Attente de MariaDB (${MYSQL_HOST})..."
-
-until mariadb -h "${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1;" > /dev/null 2>&1; do
-    echo "🔁 En attente de MariaDB..."
-    sleep 1
-done
-echo "✅ MariaDB est prêt !"
 
 cd /var/www/html
 

@@ -1,5 +1,7 @@
-.PHONY: up clean fclean down ps re
+.PHONY: up down ps clean fclean re logs
 
+DIRECTORYDATA := /home/gui/data
+DIRECTORYCOMPOSE := /home/gui/Inception/srcs/docker-compose.yml
 WORDVOLUME := /home/gui/data/wordpress
 MARIAVOLUME := /home/gui/data/database
 
@@ -10,17 +12,18 @@ SRCS_DIR = ./srcs
 up: $(NAME)
 
 $(NAME):
-	@mkdir - p $(WORDVOLUME) $(MARIAVOLUME)
+	@mkdir -p $(DIRECTORYDATA)
+	@mkdir -p $(WORDVOLUME) $(MARIAVOLUME)
 	@cd $(SRCS_DIR) && docker compose up --build -d --force-recreate
 
 down:
-	@cd $(SRCS_DIR) && docker compose -f down
+	@cd $(SRCS_DIR) && docker compose -f $(DIRECTORYCOMPOSE) down
 
 ps:
 	@cd $(SRCS_DIR) && docker compose ps
 
 clean:
-	@cd $(SRCS_DIR) && docker compose -f down --volumes --remove-orphans
+	@cd $(SRCS_DIR) && docker compose -f $(DIRECTORYCOMPOSE) down --volumes --remove-orphans
 
 fclean: clean
 	@docker system prune -af --volumes

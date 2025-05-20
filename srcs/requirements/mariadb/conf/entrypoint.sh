@@ -1,52 +1,44 @@
 #!/bin/bash
+
 set -e
 
-# Vérification des variables d'environnement
+: "${MYSQL_ROOT_PASSWORD:?Variable MYSQL_ROOT_PASSWORD non définie}"
 : "${MYSQL_DATABASE:?Variable MYSQL_DATABASE non définie}"
 : "${MYSQL_USER:?Variable MYSQL_USER non définie}"
 : "${MYSQL_PASSWORD:?Variable MYSQL_PASSWORD non définie}"
 
-echo "📦 Installation de la base de données..."
+# 👉 Crée le répertoire nécessaire pour le socket
+sudo mkdir -p /var/run/mysqld
+chown -R mysql:mysql /var/run/mysqld
 
-# Si la DB existe déjà, on ne refait pas l'init
-if [ -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
-    echo "✅ Base de données déjà initialisée, démarrage normal..."
-    exec /usr/sbin/mysqld --user=mysql
+# Initialise la base si nécessaire
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    echo "📦 Initialisation de la base de données..."
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+
+    echo "🚀 Démarrage temporaire de MariaDB en mode sans mot de passe..."
+    mysqld_safe --skip-grant-tables --user=mysql &
+    pid="$!"
+
+    sleep 10
+
+    echo "🔧 Configuration de la base de données..."
+    mysql --user=root <<-EOSQL
+        FLUSH PRIVILEGES;
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+        DELETE FROM mysql.user WHERE User='';
+        DROP DATABASE IF EXISTS test;
+        FLUSH PRIVILEGES;
+
+        CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+        CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+        GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+        FLUSH PRIVILEGES;
+EOSQL
+
+    echo "🛑 Arrêt de MariaDB temporaire..."
+    mysqladmin --user=root --password="${MYSQL_ROOT_PASSWORD}" shutdown
 fi
 
-mkdir -p /run/mysqld
-chown -R mysql:mysql /run/mysqld
-chown -R mysql:mysql /var/lib/mysql
-
-echo "🛠 Initialisation de la base..."
-mysql_install_db --user=mysql > /dev/null
-
-# Lancement de mysqld en arrière-plan (pas exec)
-echo "🚀 Lancement MariaDB pour initialisation..."
-/usr/sbin/mysqld --user=mysql --skip-networking &
-pid="$!"
-
-echo "⏳ Attente de MariaDB (mariadb-admin --wait)..."
-mariadb-admin --wait=30 --silent ping || {
-    echo "❌ MariaDB n'a pas démarré à temps."
-    kill "$pid"
-    exit 1
-}
-echo "✅ MariaDB prêt, initialisation de la base..."
-
-mariadb << EOF
-DROP DATABASE IF EXISTS $MYSQL_DATABASE;
-CREATE DATABASE $MYSQL_DATABASE;
-DROP USER IF EXISTS '${MYSQL_USER}'@'%';
-CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
-FLUSH PRIVILEGES;
-EOF
-
-echo "🛑 Arrêt du serveur temporaire..."
-kill "$pid"
-wait "$pid"
-
-echo "✅ Installation terminée"
-
-exec /usr/sbin/mysqld --user=mysql
+echo "✅ Démarrage final de MariaDB..."
+exec mysqld_safe --user=mysql

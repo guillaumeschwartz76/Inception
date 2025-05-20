@@ -8,7 +8,6 @@ FROM debian:12.10
  WORKDIR  /srcs/requirements/mariadb
 
  COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
-
  COPY conf/entrypoint.sh /entrypoint.sh
 
  RUN chmod +x /entrypoint.sh
