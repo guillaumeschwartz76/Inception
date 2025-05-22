@@ -7,15 +7,12 @@ set -e
 : "${MYSQL_USER:?Variable MYSQL_USER non définie}"
 : "${MYSQL_PASSWORD:?Variable MYSQL_PASSWORD non définie}"
 
-# 👉 Crée le répertoire nécessaire pour le socket
-sudo mkdir -p /var/run/mysqld
-chown -R mysql:mysql /var/run/mysqld
-
 # Initialise la base si nécessaire
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "📦 Initialisation de la base de données..."
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
-
+    chown -R mysql:mysql /var/lib/mysql
+	mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm > /var/log/mysql_install.log 2>&1
+fi
     echo "🚀 Démarrage temporaire de MariaDB en mode sans mot de passe..."
     mysqld_safe --skip-grant-tables --user=mysql &
     pid="$!"
@@ -38,7 +35,6 @@ EOSQL
 
     echo "🛑 Arrêt de MariaDB temporaire..."
     mysqladmin --user=root --password="${MYSQL_ROOT_PASSWORD}" shutdown
-fi
 
 echo "✅ Démarrage final de MariaDB..."
 exec mysqld_safe --user=mysql

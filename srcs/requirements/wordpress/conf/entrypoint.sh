@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "⏳ Attente de MariaDB ..."
-
 sleep 10
+echo "⏳ Attente de MariaDB ..."
 
 cd /var/www/html
 
@@ -35,10 +34,11 @@ if [ ! -f wp-config.php ]; then
         --path="/var/www/html" \
         --allow-root
 
-	wp user create	$WP_USER $WP_USER_EMAIL			\
-					--allow-root					\
-					--role=author					\
+	wp user create "${WP_USER}" "${WP_USER_EMAIL}" \
+					--allow-root \
+					--role=author \
 					--user_pass="${WP_USER_PASS}"
+
 else
     echo "✅ WordPress est déjà configuré, on ne refait rien."
 fi

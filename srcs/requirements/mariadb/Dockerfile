@@ -7,6 +7,9 @@ FROM debian:12.10
 
  WORKDIR  /srcs/requirements/mariadb
 
+ RUN mkdir -p /var/run/mysqld \
+ && chown -R mysql:mysql /var/run/mysqld
+
  COPY conf/50-server.cnf	/etc/mysql/mariadb.conf.d/50-server.cnf
  COPY conf/entrypoint.sh /entrypoint.sh
 

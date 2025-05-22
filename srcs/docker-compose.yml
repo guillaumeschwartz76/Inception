@@ -40,6 +40,18 @@ services:
     depends_on:
       - mariadb
 
+  redis:
+    container_name: redis
+    hostname: redis
+    build:
+      context: ./requirements/bonus/redis
+      dockerfile: Dockerfile
+    networks:
+      - inception
+    expose:
+      - 6379
+    restart: always
+
   nginx:
     container_name: nginx
     hostname: nginx
@@ -47,7 +59,7 @@ services:
       context: ./requirements/nginx
       dockerfile: Dockerfile
     ports:
-      - 8443:443
+      - "443:443"
     networks:
       - inception
     restart: always

@@ -21,7 +21,7 @@ FROM debian:12.10
     -keyout /etc/ssl/private/selfsigned.key \
     -out /etc/ssl/certs/selfsigned.crt \
     -days 365 \
-    -subj "/C=FR/ST=LeHavre/L=LeHavre/O=42/CN=gschwart.42.fr"
+    -subj "/C=FR/ST=LeHavre/L=LeHavre/O=42/OU=student/CN=gschwart.42.fr"
 
  COPY conf/nginx.conf /etc/nginx/
  COPY ./tools/index.html/ /var/www/html/index.html

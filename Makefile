@@ -30,6 +30,12 @@ fclean: clean
 	@docker volume prune -f
 	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME)
 
+cleanv:
+	@cd $(SRCS_DIR) && docker compose -f $(DIRECTORYCOMPOSE) down --volumes --remove-orphans
+	@docker volume prune -f
+	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME)
+
+
 re: fclean up
 
 logs:
