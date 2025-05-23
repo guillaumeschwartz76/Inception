@@ -22,6 +22,8 @@ FROM debian:12.10
  && chmod +x wp-cli.phar \
  && mv wp-cli.phar /usr/local/bin/wp
 
+ RUN apt-get install -y php8.2-redis
+
  RUN ln -sf /dev/stdout /var/log/php7.4-fpm.log
 
  COPY conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf

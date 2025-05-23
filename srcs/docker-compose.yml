@@ -19,6 +19,18 @@ services:
     volumes:
       - mariadb:/var/lib/mysql
 
+  redis:
+    container_name: redis
+    hostname: redis
+    build:
+      context: ./requirements/bonus/redis
+      dockerfile: Dockerfile
+    networks:
+      - inception
+    expose:
+      - 6379
+    restart: always
+
   wordpress:
     container_name: wordpress
     hostname: wordpress
@@ -39,18 +51,7 @@ services:
       - wordpress:/var/www/html
     depends_on:
       - mariadb
-
-  redis:
-    container_name: redis
-    hostname: redis
-    build:
-      context: ./requirements/bonus/redis
-      dockerfile: Dockerfile
-    networks:
-      - inception
-    expose:
-      - 6379
-    restart: always
+      - redis
 
   nginx:
     container_name: nginx

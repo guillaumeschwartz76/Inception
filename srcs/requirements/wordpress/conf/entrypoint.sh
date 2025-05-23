@@ -43,5 +43,17 @@ else
     echo "✅ WordPress est déjà configuré, on ne refait rien."
 fi
 
+echo "📦 Installation et configuration du plugin Redis..."
+
+wp plugin install redis-cache --activate --allow-root
+wp config set WP_REDIS_HOST redis --type=constant --allow-root
+wp config set WP_REDIS_PORT 6379 --raw --type=constant --allow-root
+wp config set WP_REDIS_TIMEOUT 3 --raw --type=constant --allow-root
+wp config set WP_REDIS_READ_TIMEOUT 3 --raw --type=constant --allow-root
+wp config set WP_REDIS_DATABASE 0 --raw --type=constant --allow-root
+
+wp redis enable --allow-root
+
+
 echo "🚀 Lancement de PHP-FPM..."
 exec php-fpm8.2 -F

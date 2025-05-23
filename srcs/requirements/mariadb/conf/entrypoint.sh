@@ -22,7 +22,6 @@ fi
     echo "🔧 Configuration de la base de données..."
     mysql --user=root <<-EOSQL
         FLUSH PRIVILEGES;
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
         DELETE FROM mysql.user WHERE User='';
         DROP DATABASE IF EXISTS test;
         FLUSH PRIVILEGES;
@@ -30,6 +29,7 @@ fi
         CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
         CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
         GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
         FLUSH PRIVILEGES;
 EOSQL
 
