@@ -19,6 +19,20 @@ services:
     volumes:
       - mariadb:/var/lib/mysql
 
+  adminer:
+    container_name: adminer
+    hostname: adminer
+    build:
+      context: ./requirements/bonus/adminer
+      dockerfile: Dockerfile
+    networks:
+      - inception
+    expose:
+      - 8080
+    restart: always
+    depends_on:
+      - mariadb
+
   redis:
     container_name: redis
     hostname: redis
@@ -30,6 +44,19 @@ services:
     expose:
       - 6379
     restart: always
+
+  ftp:
+    container_name: vsftpd
+    build:
+      context: ./requirements/bonus/ftp
+      dockerfile: Dockerfile
+    networks:
+      - inception
+    ports:
+      - "21:21"
+    restart: always
+    volumes:
+      - ftp:/home/ftpuser/ftp
 
   wordpress:
     container_name: wordpress
@@ -61,6 +88,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "443:443"
+      - "21:21"
     networks:
       - inception
     restart: always
@@ -73,6 +101,7 @@ services:
       - wordpress:/var/www/html
     depends_on:
       - wordpress
+      - ftp
 
 volumes:
   wordpress:
@@ -87,6 +116,12 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '/home/gui/data/database'
+  ftp:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/gui/data/ftp'
 
 networks:
   inception:

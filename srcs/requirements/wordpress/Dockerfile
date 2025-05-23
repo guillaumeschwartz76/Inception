@@ -24,7 +24,7 @@ FROM debian:12.10
 
  RUN apt-get install -y php8.2-redis
 
- RUN ln -sf /dev/stdout /var/log/php7.4-fpm.log
+ RUN ln -sf /dev/stdout /var/log/php8.2-fpm.log
 
  COPY conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
  COPY conf/entrypoint.sh /entrypoint.sh
