@@ -4,18 +4,11 @@ FROM debian:12.10
     && apt install -y nginx openssl \
     && echo "Mise à jour des paquets terminée"
 
- RUN mkdir -p /var/www/html
- RUN chown -R www-data:www-data /var/www/html
- RUN chmod -R 755 /var/www/html
-
- RUN mkdir -p /etc/ssl/private /etc/ssl/certs /etc/nginx/ssl \
-    && echo "Répertoires créés avec succès"
-
 # Vérification de l'installation de nginx
  RUN nginx -v
 
- ADD . /srcs/requirements/nginx
- WORKDIR  /srcs/requirements/nginx
+ ADD . /srcs/requirements/bonus/site-statique
+ WORKDIR  /srcs/requirements/bonus/site-statique
 
  RUN openssl req -x509 -nodes -newkey rsa:2048 \
     -keyout /etc/ssl/private/selfsigned.key \
@@ -29,6 +22,6 @@ FROM debian:12.10
  RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
  ln -sf /dev/stderr /var/log/nginx/error.log
 
- EXPOSE 443
+ EXPOSE 8443
 
  CMD ["nginx", "-g", "daemon off;"]

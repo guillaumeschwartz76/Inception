@@ -5,6 +5,7 @@ DIRECTORYCOMPOSE := /home/gui/Inception/srcs/docker-compose.yml
 WORDVOLUME := /home/gui/data/wordpress
 MARIAVOLUME := /home/gui/data/database
 FTPVOLUME := /home/gui/data/ftp
+GRAFANAVOLUME := /home/gui/data/grafana
 NAME := Inception
 
 SRCS_DIR = ./srcs
@@ -13,7 +14,7 @@ up: $(NAME)
 
 $(NAME):
 	@mkdir -p $(DIRECTORYDATA)
-	@mkdir -p $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME)
+	@mkdir -p $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME) $(GRAFANAVOLUME)
 	@cd $(SRCS_DIR) && docker compose up --build -d --force-recreate
 
 down:
@@ -28,12 +29,12 @@ clean:
 fclean: clean
 	@docker system prune -af --volumes
 	@docker volume prune -f
-	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME)
+	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME) $(GRAFANAVOLUME)
 
 cleanv:
 	@cd $(SRCS_DIR) && docker compose -f $(DIRECTORYCOMPOSE) down --volumes --remove-orphans
 	@docker volume prune -f
-	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME)
+	@sudo rm -rf $(WORDVOLUME) $(MARIAVOLUME) $(FTPVOLUME) $(GRAFANAVOLUME)
 
 
 re: fclean up

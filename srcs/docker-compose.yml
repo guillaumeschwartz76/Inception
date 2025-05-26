@@ -54,6 +54,7 @@ services:
       - inception
     ports:
       - "21:21"
+      - "40000-40009:40000-40009"
     restart: always
     volumes:
       - ftp:/home/ftpuser/ftp
@@ -103,6 +104,39 @@ services:
       - wordpress
       - ftp
 
+  site-statique:
+    container_name: site-statique
+    hostname: site-statique
+    build:
+      context: ./requirements/bonus/site-statique
+      dockerfile: Dockerfile
+    ports:
+      - "8443:8443"
+    networks:
+      - inception
+    restart: always
+
+  grafana:
+    container_name: grafana
+    hostname: grafana
+    build:
+      context: ./requirements/bonus/grafana
+      dockerfile: Dockerfile
+    ports:
+      - "3443:443"
+    networks:
+      - inception
+    restart: always
+    env_file:
+      - path: .env
+    secrets:
+      - db_root_password
+      - db_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - nginx
+
 volumes:
   wordpress:
     driver: local
@@ -122,6 +156,12 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '/home/gui/data/ftp'
+  grafana:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/gui/data/grafana'
 
 networks:
   inception:
