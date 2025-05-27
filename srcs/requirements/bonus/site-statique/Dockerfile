@@ -4,7 +4,6 @@ FROM debian:12.10
     && apt install -y nginx openssl \
     && echo "Mise à jour des paquets terminée"
 
-# Vérification de l'installation de nginx
  RUN nginx -v
 
  ADD . /srcs/requirements/bonus/site-statique
@@ -18,6 +17,9 @@ FROM debian:12.10
 
  COPY conf/nginx.conf /etc/nginx/
  COPY ./tools/index.html /var/www/html/index.html
+ COPY ./tools/fichier.css /var/www/html/
+ COPY ./tools/pages/ /var/www/html/
+ COPY ./tools/images/ /var/www/html/
 
  RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
  ln -sf /dev/stderr /var/log/nginx/error.log

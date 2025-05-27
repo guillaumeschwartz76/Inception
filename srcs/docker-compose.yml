@@ -45,20 +45,6 @@ services:
       - 6379
     restart: always
 
-  ftp:
-    container_name: vsftpd
-    build:
-      context: ./requirements/bonus/ftp
-      dockerfile: Dockerfile
-    networks:
-      - inception
-    ports:
-      - "21:21"
-      - "40000-40009:40000-40009"
-    restart: always
-    volumes:
-      - ftp:/home/ftpuser/ftp
-
   wordpress:
     container_name: wordpress
     hostname: wordpress
@@ -89,7 +75,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "443:443"
-      - "21:21"
     networks:
       - inception
     restart: always
@@ -102,7 +87,6 @@ services:
       - wordpress:/var/www/html
     depends_on:
       - wordpress
-      - ftp
 
   site-statique:
     container_name: site-statique
@@ -122,6 +106,9 @@ services:
     build:
       context: ./requirements/bonus/grafana
       dockerfile: Dockerfile
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     ports:
       - "3443:443"
     networks:
@@ -133,7 +120,7 @@ services:
       - db_root_password
       - db_password
     volumes:
-      - grafana_data:/var/lib/grafana
+      - grafana:/var/lib/grafana
     depends_on:
       - nginx
 
@@ -150,12 +137,6 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '/home/gui/data/database'
-  ftp:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/home/gui/data/ftp'
   grafana:
     driver: local
     driver_opts:
@@ -169,8 +150,8 @@ networks:
 
 secrets:
   db_root_password:
-    file: ./secrets/db_root_password.txt
+    file: ../secrets/db_root_password.txt
   db_password:
-    file: ./secrets/db_password.txt
+    file: ../secrets/db_password.txt
   credentials:
-    file: ./secrets/credentials.txt
+    file: ../secrets/credentials.txt

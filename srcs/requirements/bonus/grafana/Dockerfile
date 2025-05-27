@@ -3,7 +3,7 @@ FROM debian:12.10
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Installer Grafana OSS
-RUN apt-get update && apt-get install -y \
+RUN apt-get -o Acquire::http::Timeout="10" update && apt-get install -y \
     gnupg2 curl software-properties-common apt-transport-https ca-certificates \
     && curl -fsSL https://apt.grafana.com/gpg.key | gpg --dearmor -o /usr/share/keyrings/grafana.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://apt.grafana.com stable main" > /etc/apt/sources.list.d/grafana.list \
@@ -12,10 +12,16 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Générer les certificats SSL auto-signés
+RUN mkdir -p /etc/grafana/ssl && \
+    openssl req -x509 -nodes -days 365 \
+    -newkey rsa:2048 \
+    -keyout /etc/grafana/ssl/grafana.key \
+    -out /etc/grafana/ssl/grafana.crt \
+    -subj "/CN=grafana.gschwart.42.fr"
+
 # Copier config + certificats
 COPY conf/grafana.ini /etc/grafana/grafana.ini
-COPY ssl/grafana.crt /etc/grafana/ssl/grafana.crt
-COPY ssl/grafana.key /etc/grafana/ssl/grafana.key
 
 # Rediriger les logs (facultatif mais conseillé)
 RUN ln -sf /dev/stdout /var/log/grafana/grafana.log \
