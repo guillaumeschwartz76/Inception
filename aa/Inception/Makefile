@@ -1,7 +1,7 @@
 .PHONY: up down ps clean fclean re logs
 
-DIRECTORYDATA := /home/gschwart/data
-DIRECTORYCOMPOSE := /home/gschwart/Inception/srcs/docker-compose.yml
+DIRECTORYDATA := /home/gui/data
+DIRECTORYCOMPOSE := /home/gui/Inception/srcs/docker-compose.yml
 WORDVOLUME := $(DIRECTORYDATA)/wordpress
 MARIAVOLUME := $(DIRECTORYDATA)/database
 GRAFANAVOLUME := $(DIRECTORYDATA)/grafana
