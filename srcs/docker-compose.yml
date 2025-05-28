@@ -88,6 +88,28 @@ services:
     depends_on:
       - wordpress
 
+  ftp:
+    container_name: ftp
+    hostname: ftp
+    build:
+      context: ./requirements/bonus/ftp
+      dockerfile: Dockerfile
+    ports:
+      - "21:21"
+      - "40000-40004:40000-40004"
+    networks:
+      - inception
+    restart: always
+    env_file:
+      - path: .env
+    secrets:
+      - db_root_password
+      - db_password
+    volumes:
+      - wordpress:/home/ftpuser/ftp
+    depends_on:
+      - nginx
+
   site-statique:
     container_name: site-statique
     hostname: site-statique

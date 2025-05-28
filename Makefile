@@ -2,9 +2,9 @@
 
 DIRECTORYDATA := /home/gui/data
 DIRECTORYCOMPOSE := /home/gui/Inception/srcs/docker-compose.yml
-WORDVOLUME := /home/gui/data/wordpress
-MARIAVOLUME := /home/gui/data/database
-GRAFANAVOLUME := /home/gui/data/grafana
+WORDVOLUME := $(DIRECTORYDATA)/wordpress
+MARIAVOLUME := $(DIRECTORYDATA)/database
+GRAFANAVOLUME := $(DIRECTORYDATA)/grafana
 NAME := Inception
 
 SRCS_DIR = ./srcs
